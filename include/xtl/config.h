@@ -23,7 +23,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: config.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
+ * $Id: config.h,v 1.3 2005/03/06 05:08:19 philgrim Exp $
  */
 
 #ifndef __XTL_CONFIG
@@ -92,6 +92,20 @@
 #	ifndef __BYTE_ORDER
 #		define __BYTE_ORDER __BIG_ENDIAN
 #	endif
+#endif
+
+// Cygwin
+#ifdef __CYGWIN__
+#    include <sys/param.h>
+#    ifdef BYTE_ORDER
+#      if (BYTE_ORDER == LITTLE_ENDIAN)
+#        define __BYTE_ORDER __LITTLE_ENDIAN
+#      else
+#        define __BYTE_ORDER __BIG_ENDIAN
+#      endif
+#    else
+#      error "Byte Order not defined."
+#    endif
 #endif
 
 #if ((__BYTE_ORDER != __LITTLE_ENDIAN) && (__BYTE_ORDER != __BIG_ENDIAN))
