@@ -1,0 +1,42 @@
+# GNU g++
+CXX = g++
+CXXFLAGS = 
+LDFLAGS = 
+INCLUDE = -I$(TOPDIR)/include
+CXXFLAGSO = $(CXXFLAGS) -O16
+CXXFLAGSG = $(CXXFLAGS) -g
+
+# GNU gcc
+CC = gcc
+CCFLAGS = 
+CCFLAGSO = $(CCFLAGS) -O16
+CCFLAGSG = $(CCFLAGS) -g
+
+# DEC cxx
+# CXX = cxx 
+# CXXFLAGS = -ptr /tmp/xdr_cxx_repository -std strict_ansi
+# LDFLAGS = -ptr /tmp/xdr_cxx_repository
+# INCLUDE = -I$(TOPDIR)/include/cheaders -I$(TOPDIR)/include
+# CXXFLAGSO = $(CXXFLAGS) -O2
+# CXXFLAGSG = $(CXXFLAGS) -g
+
+# DEC cc
+# CC = cc
+# CCFLAGS = -std
+# CCFLAGSO = $(CCFLAGS) -O2
+# CCFLAGSG = $(CCFLAGS) -g
+
+# SGI MIPSpro C++
+# CXX = CC
+# CXXFLAGS = -ansiW -LANG:std -woff 1066,1188,1429,1521
+# LDFLAGS = -LANG:std
+# INCLUDE = -I$(TOPDIR)/include/cheaders -I$(TOPDIR)/include
+# CXXFLAGSO = $(CXXFLAGS) -O2
+# CXXFLAGSG = $(CXXFLAGS) -g
+ 
+# SGI MIPS C
+# CC = cc
+# CCFLAGS = -ansi
+# CCFLAGSO = $(CCFLAGS) -O2
+# CCFLAGSG = $(CCFLAGS) -g3
+
