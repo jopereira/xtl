@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: objio.h,v 1.1 2005/02/24 05:24:08 philgrim Exp $
+ * $Id: objio.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
  */
 
 #ifndef __XTL_OBJIO
@@ -79,7 +79,7 @@ class raw_format: public generic_format<Buffer> {
 	
 	template <class T>
 	inline void input_simple(T& data)
-		{data=*((T*)require(sizeof(T)));}
+		{data=*((T*)this->require(sizeof(T)));}
 
 	template <class Idx>
 	void input_start_array(Idx& n) {input_simple(n);}
@@ -91,14 +91,14 @@ class raw_format: public generic_format<Buffer> {
 	void input_raw(char* data, int size) {
 		int i;
 		for(i=0;i<(size>>8)-1;i++,data+=256)
-			std::memcpy(data, require(256), 256);
+			std::memcpy(data, this->require(256), 256);
 		int res=size-(i<<8);
-		std::memcpy(data, require(res), res);
+		std::memcpy(data, this->require(res), res);
 	}
 
 	template <class T>
 	inline void output_simple(T const& data)
-		{*((T*)desire(sizeof(T)))=data;}
+		{*((T*)this->desire(sizeof(T)))=data;}
 
 	template <class Idx>
 	void output_start_array(Idx n) {output_simple(n);}
@@ -109,9 +109,9 @@ class raw_format: public generic_format<Buffer> {
 	void output_raw(char const* data, int size) {
 		int i;
 		for(i=0;i<(size>>8)-1;i++,data+=256)
-			std::memcpy(desire(256), data, 256);
+			std::memcpy(this->desire(256), data, 256);
 		int res=size-(i<<8);
-		std::memcpy(desire(res), data, res);
+		std::memcpy(this->desire(res), data, res);
 	}
 };
 
@@ -518,9 +518,9 @@ class mem_buffer {
 		buffer((char*)buf),ptr((char*)buf),lim(((char*)buf)+size) {}
 
 	inline void read(char* ptr, int size)
-		{std::memcpy(ptr, require(size), size);}
+		{std::memcpy(ptr, this->require(size), size);}
 	inline void write(char const* ptr, int size)
-		{std::memcpy(desire(size), ptr, size);}
+		{std::memcpy(this->desire(size), ptr, size);}
 
 	inline void* require(int size) {
 		char* aux=ptr;
@@ -529,7 +529,7 @@ class mem_buffer {
 		return aux;
 	}
 	inline void* desire(int size)
-		{return require(size);}
+		{return this->require(size);}
 	inline void flush()
 		{}
 

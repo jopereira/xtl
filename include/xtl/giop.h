@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: giop.h,v 1.1 2005/02/24 05:24:08 philgrim Exp $
+ * $Id: giop.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
  */
 
 #ifndef __XTL_GIOP
@@ -77,12 +77,12 @@ class GIOP_format: public generic_format<Buffer> {
 
 	char* req_align( int n ) {
 		int pad = padding( n );
-		return ( reinterpret_cast<char*>( require(n+pad) ) + pad );
+		return ( reinterpret_cast<char*>( this->require(n+pad) ) + pad );
 	}
 
 	char* des_align( int n ) {
 		int pad = padding( n );
-		return ( reinterpret_cast<char*>( desire(n+pad) ) + pad );
+		return ( reinterpret_cast<char*>( this->desire(n+pad) ) + pad );
 	}
 
 	inline void h2ns( short const* in, char out[2] )
@@ -150,9 +150,9 @@ class GIOP_format: public generic_format<Buffer> {
 	void input_raw(char* data, int size) {
 		int i;
 		for(i=0;i<(size>>8)-1;i++,data+=256)
-			std::memcpy(data, require(256), 256);
+			std::memcpy(data, this->require(256), 256);
 		int res=size-(i<<8);
-		std::memcpy(data, require(res), res);
+		std::memcpy(data, this->require(res), res);
 		align+=res;
 	}
 
@@ -199,9 +199,9 @@ class GIOP_format: public generic_format<Buffer> {
 	void output_raw(char const* data, int size) {
 		int i;
 		for(i=0;i<(size>>8)-1;i++,data+=256)
-			std::memcpy(desire(256), data, 256);
+			std::memcpy(this->desire(256), data, 256);
 		int res=size-(i<<8);
-		std::memcpy(desire(res), data, res);
+		std::memcpy(this->desire(res), data, res);
 		align+=res;
 	}
 };

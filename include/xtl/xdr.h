@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: xdr.h,v 1.1 2005/02/24 05:24:08 philgrim Exp $
+ * $Id: xdr.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
  */
 
 #ifndef __XTL_XDR
@@ -53,7 +53,7 @@ inline void _xtl_big_end(char const in[], char out[]) {
 #define def_input_simple_i(type1, type2) \
 	void input_simple(type1& data) { \
 		type2 store; \
-		_xtl_big_end( reinterpret_cast<char*>( require(4) ), \
+		_xtl_big_end( reinterpret_cast<char*>( this->require(4) ), \
 			 reinterpret_cast<char*>( &store ) ); \
 		data = static_cast<type1>( store ); \
 	} 
@@ -61,9 +61,9 @@ inline void _xtl_big_end(char const in[], char out[]) {
 #define def_input_simple_ll(type1, type2) \
 	void input_simple(type1& data) { \
 		union { type2 ll; int i[2]; } store; \
-		_xtl_big_end( reinterpret_cast<char*>( require(4) ), \
+		_xtl_big_end( reinterpret_cast<char*>( this->require(4) ), \
 			 reinterpret_cast<char*>( &store.i[LOW] ) ); \
-		_xtl_big_end( reinterpret_cast<char*>( require(4) ), \
+		_xtl_big_end( reinterpret_cast<char*>( this->require(4) ), \
 		         reinterpret_cast<char*>( &store.i[HIGH] ) ); \
 		data = static_cast<type1>( store.ll ); \
 	}
@@ -72,7 +72,7 @@ inline void _xtl_big_end(char const in[], char out[]) {
  	void output_simple(type1 const& data) { \
 		type2 store = static_cast<type2>( data ); \
 		_xtl_big_end( reinterpret_cast<char*>( &store ), \
-			 reinterpret_cast<char*>( desire(4) ) ); \
+			 reinterpret_cast<char*>( this->desire(4) ) ); \
 	}
 
 #define def_output_simple_ll(type1, type2) \
@@ -80,9 +80,9 @@ inline void _xtl_big_end(char const in[], char out[]) {
 		union { type2 ll; int i[2]; } store; \
 		store.ll = static_cast<type2>( data ); \
 		_xtl_big_end( reinterpret_cast<char*>( &store.i[LOW] ), \
-			 reinterpret_cast<char*>( desire(4) ) ); \
+			 reinterpret_cast<char*>( this->desire(4) ) ); \
 		_xtl_big_end( reinterpret_cast<char*>( &store.i[HIGH] ), \
-			 reinterpret_cast<char*>( desire(4) ) ); \
+			 reinterpret_cast<char*>( this->desire(4) ) ); \
 	}
 
 template <class Buffer>
@@ -120,11 +120,11 @@ class XDR_format: public generic_format<Buffer> {
 	void input_raw(char* data, int size) {
 		int i;
 		for(i=0;i<(size>>8)-1;i++,data+=256)
-			std::memcpy(data, require(256), 256);
+			std::memcpy(data, this->require(256), 256);
 		int res=size-(i<<8);
-		std::memcpy(data, require(res), res);
+		std::memcpy(data, this->require(res), res);
 		if (res%4!=0)
-			require(4-res%4);
+			this->require(4-res%4);
 	}
 
 	template <class Idx>
@@ -153,11 +153,11 @@ class XDR_format: public generic_format<Buffer> {
 	void output_raw(char const* data, int size) {
 		int i;
 		for(i=0;i<(size>>8)-1;i++,data+=256)
-			std::memcpy(desire(256), data, 256);
+			std::memcpy(this->desire(256), data, 256);
 		int res=size-(i<<8);
-		std::memcpy(desire(res), data, res);
+		std::memcpy(this->desire(res), data, res);
 		if (res%4!=0)
-			std::memset(desire(4-res%4), 0, 4-res%4);
+			std::memset(this->desire(4-res%4), 0, 4-res%4);
 	}
 };
 

@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: text.h,v 1.1 2005/02/24 05:24:08 philgrim Exp $
+ * $Id: text.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
  */
 
 #ifndef __XTL_TEXT
@@ -33,7 +33,7 @@
 #define def_simple_output(type) \
 	void output_simple(type const& data) { \
 		space(); \
-		std::ostrstream os((char*)desire(20), 20); \
+		std::ostrstream os((char*)this->desire(20), 20); \
 		os << data; \
 		undesire(20-os.pcount()); \
  	}
@@ -42,7 +42,7 @@
 #define def_simple_output_ll(type) \
 	void output_simple(type const& data) { \
 		space(); \
-		std::ostrstream os((char*)desire(20), 20); \
+		std::ostrstream os((char*)this->desire(20), 20); \
 		os << static_cast<long>( data ); \
 		undesire(20-os.pcount()); \
  	}
@@ -76,7 +76,7 @@ class text_format: public generic_format<Buffer> {
  	bool need;
 
  	void space() {if (need) pchar(' ');need=true;}
-	void pchar(int c)	{*(char*)desire(1)=c;}
+	void pchar(int c)	{*(char*)this->desire(1)=c;}
  public:
  	typedef Buffer buffer;
 

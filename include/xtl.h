@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: xtl.h,v 1.1 2005/02/24 05:24:07 philgrim Exp $
+ * $Id: xtl.h,v 1.2 2005/03/01 16:41:24 philgrim Exp $
  */
 
 #ifndef __XTL_XTL

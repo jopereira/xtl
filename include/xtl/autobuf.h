@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: autobuf.h,v 1.1 2005/02/24 05:24:08 philgrim Exp $
+ * $Id: autobuf.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
  */
 
 #ifndef __XTL_AUTOBUF
@@ -86,11 +86,11 @@ public:
 	}
 
 	inline void read(char* ptr, int size) {
-		memcpy(ptr, require(size), size);
+		memcpy(ptr, this->require(size), size);
 	}
 
 	inline void write(char const* ptr, int size) {
-		memcpy(desire(size), ptr, size);
+		memcpy(this->desire(size), ptr, size);
 	}
 
 	inline void* require(int size) {

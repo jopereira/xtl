@@ -23,7 +23,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: config.h,v 1.1 2005/02/24 05:24:08 philgrim Exp $
+ * $Id: config.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
  */
 
 #ifndef __XTL_CONFIG
