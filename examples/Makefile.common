@@ -1,6 +1,6 @@
 # GNU g++
 CXX = g++
-CXXFLAGS = 
+CXXFLAGS = -Wno-deprecated
 LDFLAGS = 
 INCLUDE = -I$(TOPDIR)/include
 CXXFLAGSO = $(CXXFLAGS) -O16

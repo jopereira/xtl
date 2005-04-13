@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: objio.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
+ * $Id: objio.h,v 1.3 2005/04/13 21:45:23 keithsnively Exp $
  */
 
 #ifndef __XTL_OBJIO
@@ -32,6 +32,49 @@
 #include <typeinfo>
 #include <stdexcept>
 #include <string>
+
+//
+template <class Stream, class T>
+inline void composite(Stream& stream, T& data) {
+	data.composite(stream);
+}
+
+#ifdef XTL_CONFIG_SIMPLE_CONTAINERS
+
+#include <utility>
+#include <vector>
+#include <list>
+#include <map>
+
+template <class Stream, class T1, class T2>
+inline void composite(Stream& stream, std::pair<const T1,T2>& data) {
+	stream.simple(const_cast<T1&>(data.first));
+	stream.simple(data.second);
+}
+
+template <class Stream, class T1, class T2>
+inline void composite(Stream& stream, std::pair<T1,T2>& data) {
+	stream.simple(data.first);
+	stream.simple(data.second);
+}
+
+template <class Stream, class T>
+inline void composite(Stream& stream, std::list<T>& data) {
+	stream.container(data);
+}
+
+template <class Stream, class T>
+inline void composite(Stream& stream, std::vector<T>& data) {
+	stream.container(data);
+}
+
+template <class Stream, class T1, class T2>
+inline void composite(Stream& stream, std::map<T1, T2>& data) {
+	stream.container(data);
+}
+
+#endif
+
 
 template <class Buffer>
 class generic_format {
@@ -477,11 +520,6 @@ class obj_output {
 #undef def_simple_input
 #undef def_simple_output
 
-template <class Stream, class T>
-inline void composite(Stream& stream, T& data) {
-	data.composite(stream);
-}
-
 class no_refs {
  public:
  	template <class Format, class T>
@@ -554,45 +592,11 @@ class mem_buffer {
 
 	template <class Format>
 	inline void composite(obj_output<Format>& stream) {
-		stream.array(buffer, lim-buffer).simple((int)ptr-buffer);
+		stream.array(buffer, lim-buffer).simple((int)(ptr-buffer));
 	}
 
 };
 
-#ifdef XTL_CONFIG_SIMPLE_CONTAINERS
 
-#include <utility>
-#include <vector>
-#include <list>
-#include <map>
-
-template <class Stream, class T1, class T2>
-inline void composite(Stream& stream, std::pair<const T1,T2>& data) {
-	stream.simple(const_cast<T1&>(data.first));
-	stream.simple(data.second);
-}
-
-template <class Stream, class T1, class T2>
-inline void composite(Stream& stream, std::pair<T1,T2>& data) {
-	stream.simple(data.first);
-	stream.simple(data.second);
-}
-
-template <class Stream, class T>
-inline void composite(Stream& stream, std::list<T>& data) {
-	stream.container(data);
-}
-
-template <class Stream, class T>
-inline void composite(Stream& stream, std::vector<T>& data) {
-	stream.container(data);
-}
-
-template <class Stream, class T1, class T2>
-inline void composite(Stream& stream, std::map<T1, T2>& data) {
-	stream.container(data);
-}
-
-#endif
 
 #endif

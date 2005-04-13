@@ -23,7 +23,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: config.h,v 1.3 2005/03/06 05:08:19 philgrim Exp $
+ * $Id: config.h,v 1.4 2005/04/13 21:45:23 keithsnively Exp $
  */
 
 #ifndef __XTL_CONFIG
@@ -53,7 +53,9 @@
 
 #elif defined (_WIN32)
 
-#	define XTL_CONFIG_COMPOSITE_BUG
+#       if defined(_MSC_VER) && _MSC_VER <= 1200  // VC6 or older
+#	    define XTL_CONFIG_COMPOSITE_BUG
+#       endif
 #	define XTL_CONFIG_LACK_ENDIAN_H
 
 	typedef __int64  longlong;
@@ -93,6 +95,11 @@
 #		define __BYTE_ORDER __BIG_ENDIAN
 #	endif
 #endif
+
+#elif defined _WIN32
+#	ifndef __BYTE_ORDER
+#		define __BYTE_ORDER __LITTLE_ENDIAN
+#	endif
 
 // Cygwin
 #ifdef __CYGWIN__
