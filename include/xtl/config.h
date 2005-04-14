@@ -23,7 +23,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: config.h,v 1.5 2005/04/14 15:28:37 keithsnively Exp $
+ * $Id: config.h,v 1.6 2005/04/14 16:59:00 keithsnively Exp $
  */
 
 #ifndef __XTL_CONFIG
@@ -93,12 +93,13 @@
 #	ifndef __BYTE_ORDER
 #		define __BYTE_ORDER __BIG_ENDIAN
 #	endif
-#endif
 
 #elif defined _WIN32
 #	ifndef __BYTE_ORDER
 #		define __BYTE_ORDER __LITTLE_ENDIAN
 #	endif
+
+#endif
 
 // Cygwin
 #ifdef __CYGWIN__
