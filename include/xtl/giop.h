@@ -22,11 +22,13 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: giop.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
+ * $Id: giop.h,v 1.3 2005/04/14 15:28:37 keithsnively Exp $
  */
 
 #ifndef __XTL_GIOP
 #define __XTL_GIOP
+
+#include "config.h"
 
 // These should be static const fields of GIOP_format, but some
 // compilers prefer them like this.

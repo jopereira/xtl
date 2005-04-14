@@ -22,11 +22,13 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: xdr.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
+ * $Id: xdr.h,v 1.3 2005/04/14 15:28:37 keithsnively Exp $
  */
 
 #ifndef __XTL_XDR
 #define __XTL_XDR
+
+#include "config.h"
 
 // data is stored with big endian ordering (XDR standard)
 // this must be global due to a joint g++/glibc/i386 "feature"

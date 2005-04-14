@@ -23,7 +23,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: config.h,v 1.4 2005/04/13 21:45:23 keithsnively Exp $
+ * $Id: config.h,v 1.5 2005/04/14 15:28:37 keithsnively Exp $
  */
 
 #ifndef __XTL_CONFIG
@@ -54,7 +54,9 @@
 #elif defined (_WIN32)
 
 #       if defined(_MSC_VER) && _MSC_VER <= 1200  // VC6 or older
-#	    define XTL_CONFIG_COMPOSITE_BUG
+#           define XTL_CONFIG_COMPOSITE_BUG
+            // Work around for broken for-scoping with Visual C++ 6.0
+#           define for if(0);else for
 #       endif
 #	define XTL_CONFIG_LACK_ENDIAN_H
 
@@ -63,9 +65,6 @@
 
 	// Disable some stupid warnings
 #	pragma warning(disable:4127 4786 4800)
-
-	// Work around for broken for-scoping with Visual C++ 6.0
-#	define for if(0);else for
 
 	// Enable a bunch of useful warnings
 #	pragma warning(3:4019 4032 4057 4061 4125 4130 4152 4189 4201 4706)

@@ -4,7 +4,7 @@
  *
  * jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
  *
- * $Id: alltests.h,v 1.1 2005/02/24 05:24:07 philgrim Exp $
+ * $Id: alltests.h,v 1.2 2005/04/14 15:28:36 keithsnively Exp $
  */
 
 
@@ -40,7 +40,7 @@ class numbers {
 		aChar3=-6;  anInt=-7;  anUInt=8;
 		aChar4=-9;  aLong=-10; anULong=11;
 		aChar5=-12; aLongLong=-13; anULongLong=(unsignedlonglong(12345678ul) << 32) | 9012ul;
-		aChar6=-15; aFloat=13.14; aDouble=15.16;
+		aChar6=-15; aFloat=(float)13.14; aDouble=15.16;
 	}
 
 	template <class Stream>
