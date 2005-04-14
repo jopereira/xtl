@@ -4,7 +4,7 @@
  *
  * jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
  *
- * $Id: main.cpp,v 1.2 2005/04/13 21:45:17 keithsnively Exp $
+ * $Id: main.cpp,v 1.3 2005/04/14 17:07:55 philgrim Exp $
  */
 
 
@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 	compare(to, ti);
 
 	// uncomment when debugging
-#if 1
+#if 0
 	mem_buffer xmbo(buf, 4000);
 	text_format<mem_buffer> xrfo(xmbo);
 	obj_output<text_format<mem_buffer> > xos(xrfo);
