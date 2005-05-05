@@ -23,7 +23,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: config.h,v 1.6 2005/04/14 16:59:00 keithsnively Exp $
+ * $Id: config.h,v 1.7 2005/05/05 20:41:07 keithsnively Exp $
  */
 
 #ifndef __XTL_CONFIG
@@ -57,6 +57,8 @@
 #           define XTL_CONFIG_COMPOSITE_BUG
             // Work around for broken for-scoping with Visual C++ 6.0
 #           define for if(0);else for
+#       else
+#           define XTL_CONFIG_SIMPLE_CONTAINERS
 #       endif
 #	define XTL_CONFIG_LACK_ENDIAN_H
 
