@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: graphio.h,v 1.3 2005/03/06 05:08:20 philgrim Exp $
+ * $Id: graphio.h,v 1.4 2006/03/27 18:16:58 keithsnively Exp $
  */
 
 #ifndef __XTL_GRAPHIO
@@ -47,7 +47,7 @@ class graph_refs {
 			ptr=new T;
 			trans.insert(std::pair<void*,int>(((void*)ptr), label));
 			label++;
-			stream.content(*ptr);
+			stream.XTL_CONTENT(*ptr);
 		} else 
 			ptr=(T*)trans[x];
 	}
@@ -62,7 +62,7 @@ class graph_refs {
 			trans.insert(std::pair<void* const,int>((void*)ptr, label));
 			int tmp=label;
 			label++;
-			stream.content(*ptr);
+			stream.XTL_CONTENT(*ptr);
 		}
 	}
 };

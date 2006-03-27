@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: objio.h,v 1.3 2005/04/13 21:45:23 keithsnively Exp $
+ * $Id: objio.h,v 1.4 2006/03/27 18:16:58 keithsnively Exp $
  */
 
 #ifndef __XTL_OBJIO
@@ -163,9 +163,9 @@ class raw_format: public generic_format<Buffer> {
 #endif
 
 #ifdef XTL_CONFIG_COMPOSITE_BUG
-#define content(d) composite(d)
+#define XTL_CONTENT(d) composite(d)
 #else
-#define content(d) simple(d)
+#define XTL_CONTENT(d) simple(d)
 #define array_s array
 #define vector_s vector
 #endif
@@ -222,13 +222,24 @@ class obj_input {
 	}
 
 	inline obj_input& simple(std::string& data) {
+
+		// Using the stack buffer saves about 20% - 40% in decoding time.
+	        char s_buf[1024];
+        	char * tmp = s_buf;
+	        bool allocated = false;
+
 		int size;
 		format.input_start_array(size);
-		char* tmp=new char[size];
+	        if ( size > 1024 )
+        	{
+        		tmp = new char[size];
+	        	allocated = true;
+	        }
 		format.input_chars(tmp, size);
-		data=std::string(tmp, size);
-		// FIXME: This causes a crash. Investigate...
-		//delete[] tmp;
+	        data.clear();
+		data.append(tmp, size);
+		// FIXME: Fix in the official version
+	        if ( allocated ) delete[] tmp;
 		format.input_end_array(size);
 		return *this;
 	}
@@ -237,7 +248,7 @@ class obj_input {
 	inline obj_input& vector(T data[], int size) {
 		format.input_start_vector();
 		for(int i=0;i<size;i++)
-			content(data[i]);
+			XTL_CONTENT(data[i]);
 		format.input_end_vector();
 		return *this;
 	}
@@ -247,7 +258,7 @@ class obj_input {
 		format.input_start_array(size);
 		data=new T[size];
 		for(int j=size,i=0;!format.input_end_array(j);i++)
-			content(data[i]);
+			XTL_CONTENT(data[i]);
 		return *this;
 	}
 
@@ -324,16 +335,19 @@ class obj_input {
 	}
 
 	template <class T>
-	inline obj_input& container(T& data) {
-		int j=0;
-		format.input_start_array(j);
-		while(!format.input_end_array(j)) {
-			typename T::value_type v;
-			content(v);
-			data.insert(data.end(), v);
-		}
-		return *this;
-	}
+        inline obj_input& container(T& data) {
+                int j=0;
+                T tmp;
+                format.input_start_array(j);
+                while(!format.input_end_array(j)) {
+                        typename T::value_type v;
+                        XTL_CONTENT(v);
+                        tmp.insert(tmp.end(), v);
+                }
+                data.swap(tmp);
+                return *this;
+        }
+
 
 #ifdef XTL_CONFIG_CHOICE_MACROS
 	decl_ich_method(2)
@@ -406,7 +420,7 @@ class obj_output {
 	inline obj_output& vector(const T data[], int size) {
 		format.output_start_vector();
 		for(int i=0;i<size;i++)
-			content(data[i]);
+			XTL_CONTENT(data[i]);
 		format.output_end_vector();
 		return *this;
 	}
@@ -415,7 +429,7 @@ class obj_output {
 	inline obj_output& array(T const* data, Idx size) {
 		format.output_start_array(size);
 		for(int i=0;i<size;i++)
-			content(data[i]);
+			XTL_CONTENT(data[i]);
 		format.output_end_array();
 		return *this;
 	}
@@ -496,7 +510,7 @@ class obj_output {
 		for(typename T::const_iterator i=data.begin();
 			i!=data.end();
 			i++)
-			content(*i);
+			XTL_CONTENT(*i);
 		format.output_end_array();
 		return *this;
 	}
@@ -526,12 +540,12 @@ class no_refs {
 	void reference(obj_input<Format>& stream, T*& data) {
 		delete data;
 		data=new T;
-		stream.content(*data);
+		stream.XTL_CONTENT(*data);
 	}
 
  	template <class Format, class T>
 	void reference(obj_output<Format>& stream, T const* data) {
-		stream.content(*data);
+		stream.XTL_CONTENT(*data);
 	}
 };
 

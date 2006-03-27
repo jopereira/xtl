@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: autobuf.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
+ * $Id: autobuf.h,v 1.3 2006/03/27 18:16:58 keithsnively Exp $
  */
 
 #ifndef __XTL_AUTOBUF
@@ -138,7 +138,6 @@ public:
 		stream.array(buffer, size).simple(idx);
 		pos = idx;
 		lim = size;
-		count = 1;
 	}
 	
 	template <class Format>
