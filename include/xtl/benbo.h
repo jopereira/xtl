@@ -1,6 +1,8 @@
 /*
  * Big Endian Network Byte Order encoding class for XTL.
  *
+ * Copyright (C) 2006 Keith Snively, aksnively@yahoo.com
+ * Copyright (C) 2003 Mike Caruso, mcaruso@nvl.army.mil
  */
 /* XTL - eXternalization Template Library - http://gsd.di.uminho.pt/~jop/xtl
  * Copyright (C) 1998-2000 Jose' Orlando Pereira, Universidade do Minho
