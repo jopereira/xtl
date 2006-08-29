@@ -22,7 +22,9 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: autobuf.h,v 1.3 2006/03/27 18:16:58 keithsnively Exp $
+ * $Id: autobuf.h,v 1.4 2006/08/29 18:42:38 keithsnively Exp $
+ *
+ * Author: Mike Caruso                                                        |
  */
 
 #ifndef __XTL_AUTOBUF

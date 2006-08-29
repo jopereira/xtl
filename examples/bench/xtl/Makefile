@@ -3,7 +3,7 @@
 # 
 # jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
 #
-# $Id: Makefile,v 1.1 2005/02/24 05:24:07 philgrim Exp $
+# $Id: Makefile,v 1.2 2006/08/29 18:42:37 keithsnively Exp $
 
 TOPDIR  := $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)/../../..
 
@@ -11,7 +11,7 @@ TOPDIR  := $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)/../../..
 # the modified file to jop@di.uminho.pt
 include ../../Makefile.common
 
-all: raw oraw giop ogiop xdr oxdr 
+all: raw oraw giop ogiop xdr oxdr benbo obenbo 
 
 %: %.cpp
 	$(CXX) $(CXXFLAGSG) -o $@ $(INCLUDE) $<
@@ -29,6 +29,14 @@ times: all
 	time ./oxdr >> ../xtl.times 2>&1
 	time ./oxdr >> ../xtl.times 2>&1
 	time ./oxdr >> ../xtl.times 2>&1
+	echo "benbo" >> ../xtl.times 2>&1
+	time ./benbo >> ../xtl.times 2>&1
+	time ./benbo >> ../xtl.times 2>&1
+	time ./benbo >> ../xtl.times 2>&1
+	echo "benbo opt" >> ../xtl.times 2>&1
+	time ./obenbo >> ../xtl.times 2>&1
+	time ./obenbo >> ../xtl.times 2>&1
+	time ./obenbo >> ../xtl.times 2>&1
 	echo "giop" >> ../xtl.times 2>&1
 	time ./giop >> ../xtl.times 2>&1
 	time ./giop >> ../xtl.times 2>&1
@@ -51,7 +59,7 @@ dep:
 	makedepend -f .depend $(INCLUDE) *.cpp
 
 clean:
-	rm -f raw oraw giop ogiop xdr oxdr core .depend .depend.bak
+	rm -f raw oraw giop ogiop xdr oxdr benbo obenbo core .depend .depend.bak
 
 ifeq (.depend,$(wildcard .depend))
 include .depend

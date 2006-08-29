@@ -3,7 +3,7 @@
 # 
 # jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
 #
-# $Id: Makefile,v 1.1 2005/02/24 05:24:07 philgrim Exp $
+# $Id: Makefile,v 1.2 2006/08/29 18:42:37 keithsnively Exp $
 
 TOPDIR  := $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)/../..
 
@@ -13,9 +13,9 @@ include ../Makefile.common
 
 all: nonopt opt
 
-nonopt: raw giop xdr rawfile
+nonopt: benbo raw giop xdr rawfile
 
-opt: oraw ogiop oxdr
+opt: obenbo oraw ogiop oxdr obenbo
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGSG) -c -o $@ $(INCLUDE) $<
@@ -33,14 +33,14 @@ tests: xtl.tests
 	cat xtl.tests
 
 xtl.tests: all
-	(./raw ; ./oraw ; ./giop ; ./ogiop ; ./xdr ; ./oxdr) > xtl.tests 2>&1
+	(./raw ; ./oraw ; ./giop ; ./ogiop ; ./xdr ; ./oxdr ; ./benbo ; ./obenbo) > xtl.tests 2>&1
 
 dep:
 	touch .depend
 	makedepend -f .depend $(INCLUDE) *.cpp
 
 clean:
-	rm -f raw oraw giop ogiop xdr oxdr rawfile *.o test.raw xtl.tests core .depend .depend.bak
+	rm -f raw oraw giop ogiop xdr oxdr benbo obenbo rawfile *.o test.raw xtl.tests core .depend .depend.bak
 
 ifeq (.depend,$(wildcard .depend))
 include .depend

@@ -4,7 +4,7 @@
  *
  * jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
  *
- * $Id: main.cpp,v 1.3 2005/04/14 17:07:55 philgrim Exp $
+ * $Id: main.cpp,v 1.4 2006/08/29 18:42:37 keithsnively Exp $
  */
 
 
@@ -35,6 +35,8 @@ int main(int argc, char* argv[]) {
 
 	compare(to, ti);
 
+        std::cout << to << std::endl;
+        std::cout << ti << std::endl;
 	// uncomment when debugging
 #if 0
 	mem_buffer xmbo(buf, 4000);

@@ -4,7 +4,7 @@
  *
  * jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
  *
- * $Id: alltests.h,v 1.2 2005/04/14 15:28:36 keithsnively Exp $
+ * $Id: alltests.h,v 1.3 2006/08/29 18:42:37 keithsnively Exp $
  */
 
 
@@ -73,6 +73,8 @@ class numbers {
 			aFloat==other.aFloat &&
 			aDouble==other.aDouble;
 	}
+
+  friend std::ostream & operator<<( std::ostream & os, numbers const & a );
 };
 
 class strings {
@@ -403,19 +405,21 @@ class all_tests {
 	}
 
 	bool operator==(const all_tests& other) const {
-		return n==other.n &&
-			s==other.s &&
-			a==other.a &&
-			p==other.p &&
-			t==other.t &&
-			c==other.c &&
+		return n==other.n 
+                  && s==other.s 
+                  && a==other.a 
+                  && p==other.p 
+                  && t==other.t 
+                  && c==other.c 
 #ifdef XTL_CONFIG_CHOICE_MACROS
-			u==other.u &&
-			o==other.o &&
+                  && u==other.u 
+                  && o==other.o 
 #endif
-			b==other.b &&
-			true;
+                  && b==other.b 
+                  ;
 	}
+
+  friend std::ostream & operator<<( std::ostream & os, all_tests const & a );
 };
 
 #if defined(IMPL_ALLTESTS) && defined(XTL_CONFIG_CHOICE_MACROS)
@@ -432,5 +436,36 @@ void derived::init() {
 	b=3;
 }
 #endif
+
+
+
+inline std::ostream & operator<<( std::ostream & os, numbers const & n )
+{
+  os << "{ " 
+     << n.aBool << ", "
+     << n.aChar << ", "
+     << n.anUChar << ", "
+     << n.aChar2 << ", "
+     << n.anUShort << ", "
+     << n.aChar3 << ", "
+     << n.anInt << ", "
+     << n.anUInt << ", "
+     << n.aChar4 << ", "
+     << n.aLong << ", "
+     << n.anULong << ", "
+     << n.aChar5 << ", "
+     << n.aLongLong << ", "
+     << n.anULongLong << ", "
+     << n.aChar6 << ", "
+     << n.aFloat << ", "
+     << n.aDouble 
+     << " }" 
+     << std::endl;
+}
+
+inline std::ostream & operator<<( std::ostream & os, all_tests const & a )
+{
+  os << "n = " << a.n << std::endl;
+}
 
 #endif
