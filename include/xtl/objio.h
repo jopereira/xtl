@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: objio.h,v 1.4 2006/03/27 18:16:58 keithsnively Exp $
+ * $Id: objio.h,v 1.5 2007/04/06 13:25:49 keithsnively Exp $
  */
 
 #ifndef __XTL_OBJIO
@@ -335,6 +335,64 @@ class obj_input {
 	}
 
 	template <class T>
+        inline obj_input& container(std::vector< T > & data) {
+                typedef std::vector< T > t_V;
+
+                int j=0;
+                format.input_start_array(j);
+                t_V tmp( j );
+                typename t_V::iterator it = tmp.begin();
+
+                while(!format.input_end_array(j)) 
+                {
+                  XTL_CONTENT(*it);
+                  ++it;
+                }
+                data.swap(tmp);
+                return *this;
+        }
+
+        // std::vector< bool > is a special case according to the 1998 C++
+        // specification since it is really a bitset and not a real vector.
+        // Needs different handling here.
+        inline obj_input& container(std::vector< bool > & data) {
+                typedef std::vector< bool > t_V;
+
+                int j=0;
+                format.input_start_array(j);
+                t_V tmp( j );
+                typename t_V::iterator it = tmp.begin();
+
+                while(!format.input_end_array(j)) 
+                {
+                  bool b;
+                  XTL_CONTENT( b );
+                  *it = b;
+                  ++it;
+                }
+                data.swap(tmp);
+                return *this;
+        }
+
+	template <class T>
+        inline obj_input& container(std::list< T > & data) {
+                typedef std::list< T > t_L;
+
+                int j=0;
+                format.input_start_array(j);
+                t_L tmp( j );
+                typename t_L::iterator it = tmp.begin();
+
+                while(!format.input_end_array(j)) 
+                {
+                  XTL_CONTENT(*it);
+                  ++it;
+                }
+                data.swap(tmp);
+                return *this;
+        }
+
+	template <class T>
         inline obj_input& container(T& data) {
                 int j=0;
                 T tmp;
@@ -507,10 +565,12 @@ class obj_output {
 	inline obj_output& container(T const& data) {
 		int j=data.size();
 		format.output_start_array(j);
-		for(typename T::const_iterator i=data.begin();
-			i!=data.end();
-			i++)
+		for( typename T::const_iterator i=data.begin();
+                     i != data.end();
+                     ++i )
+                {
 			XTL_CONTENT(*i);
+                }
 		format.output_end_array();
 		return *this;
 	}
