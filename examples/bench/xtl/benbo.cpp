@@ -4,14 +4,13 @@
  *
  * jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
  *
- * $Id: benbo.cpp,v 1.1 2006/08/29 18:42:37 keithsnively Exp $
+ * $Id: benbo.cpp,v 1.2 2009/04/01 18:07:14 keithsnively Exp $
  */
 
 
 #include <iostream>
 
-#include <xtl/objio.h>
-#include <xtl/benbo.h>
+#include <xtl.h>
 
 #define IMPL_ALLTESTS
 #include "../../alltests.h"
