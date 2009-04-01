@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: xdr.h,v 1.5 2009/04/01 18:07:14 keithsnively Exp $
+ * $Id: xdr.h,v 1.6 2009/04/01 19:09:01 keithsnively Exp $
  */
 
 #ifndef __XTL_XDR
@@ -68,7 +68,7 @@ public:
 		data = static_cast<type1>( store ); \
 	} 
 
-#define def_input_output_xdr_t(type1, type2) \
+#define def_output_simple_xdr_t(type1, type2) \
  	void output_simple(type1 const& data) { \
 		type2 store = static_cast<type2>( data ); \
 		simple_xdr_policy< sizeof( type2 ) >::copy( \
@@ -85,7 +85,7 @@ public:
             reinterpret_cast<char*>(&data) ); \
 	} 
 
-#define def_input_output_xdr(type) \
+#define def_output_simple_xdr(type) \
 	void output_simple(type const& data) \
         { \
           simple_xdr_policy< sizeof( type ) >::copy( \
@@ -142,22 +142,22 @@ class XDR_format: public generic_format<Buffer> {
 	void output_start_array(Idx n) {output_simple(n);}
 	void output_end_array() {}
 
-	def_input_output_xdr_t(bool, int)
-	def_input_output_xdr_t(char, int)
-	def_input_output_xdr_t(unsigned char, int)
-	def_input_output_xdr_t(short, int)
-	def_input_output_xdr_t(unsigned short, int)
+	def_output_simple_xdr_t(bool, int)
+	def_output_simple_xdr_t(char, int)
+	def_output_simple_xdr_t(unsigned char, int)
+	def_output_simple_xdr_t(short, int)
+	def_output_simple_xdr_t(unsigned short, int)
 
         // These types do not need to be translated, avoiding a copy.  Note that
         // "long" is treated as native length.
-	def_input_output_xdr(int)
-	def_input_output_xdr(unsigned int)
-	def_input_output_xdr(long)
-	def_input_output_xdr(unsigned long)
-	def_input_output_xdr(longlong)
-	def_input_output_xdr(unsignedlonglong)
-	def_input_output_xdr(float)
-	def_input_output_xdr(double)
+	def_output_simple_xdr(int)
+	def_output_simple_xdr(unsigned int)
+	def_output_simple_xdr(long)
+	def_output_simple_xdr(unsigned long)
+	def_output_simple_xdr(longlong)
+	def_output_simple_xdr(unsignedlonglong)
+	def_output_simple_xdr(float)
+	def_output_simple_xdr(double)
 
 	void output_chars(char const* data, int size) {
 		output_raw(data, size);
@@ -177,8 +177,8 @@ class XDR_format: public generic_format<Buffer> {
 
 #undef def_input_simple_xdr_t
 #undef def_input_simple_xdr_t
-#undef def_input_output_xdr_t
-#undef def_input_output_xdr_t
+#undef def_output_simple_xdr_t
+#undef def_output_simple_xdr_t
 #undef LOW
 #undef HIGH
 
