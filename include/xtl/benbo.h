@@ -1,8 +1,6 @@
 /*
  * Big Endian Network Byte Order encoding class for XTL.
  *
- * Copyright (C) 2006 Keith Snively, aksnively@yahoo.com
- * Copyright (C) 2003 Mike Caruso, mcaruso@nvl.army.mil
  */
 /* XTL - eXternalization Template Library - http://gsd.di.uminho.pt/~jop/xtl
  * Copyright (C) 1998-2000 Jose' Orlando Pereira, Universidade do Minho
@@ -29,40 +27,6 @@
 
 #include "config.h"
 
-// data is stored with big endian ordering (BENBO standard)
-// this must be global due to a joint g++/glibc/i386 "feature"
-#if (__BYTE_ORDER == __LITTLE_ENDIAN)
-inline void _xtl_big_end_16(char const* in, char* out ) {
-	*reinterpret_cast<unsigned short*>(out) = \
-      bswap_16( *reinterpret_cast<const unsigned short*>( in ) );
-}
-
-inline void _xtl_big_end_32(char const* in, char* out ) {
-	*reinterpret_cast<unsigned int*>(out) = \
-      bswap_32( *reinterpret_cast<const unsigned int*>( in ) );
-}
-
-inline void _xtl_big_end_64(char const* in, char* out ) {
-	*reinterpret_cast<unsignedlonglong*>(out) = \
-      bswap_64( *reinterpret_cast<const unsignedlonglong*>( in ) );
-}
-#elif (__BYTE_ORDER == __BIG_ENDIAN)
-inline void _xtl_big_end_16(char const* in, char* out ) {
-	*reinterpret_cast<unsigned short*>(out) = \
-      *reinterpret_cast<const unsigned short*>( in );
-}
-
-inline void _xtl_big_end_32(char const* in, char* out ) {
-	*reinterpret_cast<unsigned int*>(out) = \
-      *reinterpret_cast<const unsigned int*>( in );
-}
-
-inline void _xtl_big_end_64(char const* in, char* out ) {
-	*reinterpret_cast<unsignedlonglong*>(out) = \
-      *reinterpret_cast<const unsignedlonglong*>( in );
-}
-#endif
-  
 // Template policy to handle different sized simple types.  Works seemlessly on
 // 32 and 64 bit platforms.
 template< unsigned char >

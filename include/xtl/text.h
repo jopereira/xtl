@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: text.h,v 1.3 2005/04/13 21:45:23 keithsnively Exp $
+ * $Id: text.h,v 1.4 2009/04/01 15:55:17 keithsnively Exp $
  */
 
 #ifndef __XTL_TEXT
@@ -35,7 +35,7 @@
 		space(); \
 		std::ostrstream os((char*)this->desire(20), 20); \
 		os << data; \
-		undesire(20-os.pcount()); \
+		this->undesire(20-os.pcount());       \
  	}
 
 // Required to compile "long long" with DEC cxx -std strict_ansi
@@ -44,7 +44,7 @@
 		space(); \
 		std::ostrstream os((char*)this->desire(20), 20); \
 		os << static_cast<long>( data ); \
-		undesire(20-os.pcount()); \
+		this->undesire(20-os.pcount());        \
  	}
 
 

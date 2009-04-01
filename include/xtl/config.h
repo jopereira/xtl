@@ -23,7 +23,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: config.h,v 1.7 2005/05/05 20:41:07 keithsnively Exp $
+ * $Id: config.h,v 1.8 2009/04/01 15:55:17 keithsnively Exp $
  */
 
 #ifndef __XTL_CONFIG
@@ -152,5 +152,41 @@ inline unsignedlonglong bswap_64(unsignedlonglong b) {
 #else
 #include <cstring>
 #endif
+
+
+// data is stored with big endian ordering
+// this must be global due to a joint g++/glibc/i386 "feature"
+#if (__BYTE_ORDER == __LITTLE_ENDIAN)
+inline void _xtl_big_end_16(char const* in, char* out ) {
+	*reinterpret_cast<unsigned short*>(out) = \
+      bswap_16( *reinterpret_cast<const unsigned short*>( in ) );
+}
+
+inline void _xtl_big_end_32(char const* in, char* out ) {
+	*reinterpret_cast<unsigned int*>(out) = \
+      bswap_32( *reinterpret_cast<const unsigned int*>( in ) );
+}
+
+inline void _xtl_big_end_64(char const* in, char* out ) {
+	*reinterpret_cast<unsignedlonglong*>(out) = \
+      bswap_64( *reinterpret_cast<const unsignedlonglong*>( in ) );
+}
+#elif (__BYTE_ORDER == __BIG_ENDIAN)
+inline void _xtl_big_end_16(char const* in, char* out ) {
+	*reinterpret_cast<unsigned short*>(out) = \
+      *reinterpret_cast<const unsigned short*>( in );
+}
+
+inline void _xtl_big_end_32(char const* in, char* out ) {
+	*reinterpret_cast<unsigned int*>(out) = \
+      *reinterpret_cast<const unsigned int*>( in );
+}
+
+inline void _xtl_big_end_64(char const* in, char* out ) {
+	*reinterpret_cast<unsignedlonglong*>(out) = \
+      *reinterpret_cast<const unsignedlonglong*>( in );
+}
+#endif
+  
 
 #endif

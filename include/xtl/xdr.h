@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: xdr.h,v 1.3 2005/04/14 15:28:37 keithsnively Exp $
+ * $Id: xdr.h,v 1.4 2009/04/01 15:55:17 keithsnively Exp $
  */
 
 #ifndef __XTL_XDR
@@ -30,62 +30,68 @@
 
 #include "config.h"
 
-// data is stored with big endian ordering (XDR standard)
-// this must be global due to a joint g++/glibc/i386 "feature"
-#if (__BYTE_ORDER == __LITTLE_ENDIAN)
-inline void _xtl_big_end(char const in[], char out[]) {
-	*reinterpret_cast<unsigned int*>(out) =
-	  bswap_32(*reinterpret_cast<const unsigned int*>(in));
-}
-#define LOW 1
-#define HIGH 0
-#elif (__BYTE_ORDER == __BIG_ENDIAN)
-inline void _xtl_big_end(char const in[], char out[]) {
- 	*reinterpret_cast<unsigned int*>(out) =
-	  *reinterpret_cast<const unsigned int*>(in);
-}
-#define LOW 0
-#define HIGH 1
-#endif
-  
+// Template policy to handle different sized simple types.  Works seemlessly on
+// 32 and 64 bit platforms.
+template< unsigned char >
+class simple_xdr_policy;
+
+// Only types of size 4 and 16 should be supported for XDR.  Everything else
+// will fail to compile (a good thing).
+template<>
+class simple_xdr_policy< 4 >
+{
+public:
+  static inline void copy(char const* in, char* out)
+  {
+    _xtl_big_end_32( in, out );
+  }
+};
+
+template<>
+class simple_xdr_policy< 8 >
+{
+public:
+  static inline void copy(char const* in, char* out)
+  {
+    _xtl_big_end_64( in, out );
+  }
+};
+
 // Macros to keep things neat and tidy in class XDR_format.
-// All data is stored in 32 bit chunks (XDR standard), those
-// types longer than 32 bits being accessed through a union to avoid
-// "unaligned access errors" on 64 bit machines.
-#define def_input_simple_i(type1, type2) \
+// All data is stored in 32 bit or 64 bit chunks (XDR standard RFC 1832)
+#define def_input_simple_t(type1, type2) \
 	void input_simple(type1& data) { \
 		type2 store; \
-		_xtl_big_end( reinterpret_cast<char*>( this->require(4) ), \
+		simple_xdr_policy< sizeof( type2 ) >::copy( \
+                         reinterpret_cast<char const*>( this->require( sizeof( type2 ) ) ), \
 			 reinterpret_cast<char*>( &store ) ); \
 		data = static_cast<type1>( store ); \
 	} 
 
-#define def_input_simple_ll(type1, type2) \
-	void input_simple(type1& data) { \
-		union { type2 ll; int i[2]; } store; \
-		_xtl_big_end( reinterpret_cast<char*>( this->require(4) ), \
-			 reinterpret_cast<char*>( &store.i[LOW] ) ); \
-		_xtl_big_end( reinterpret_cast<char*>( this->require(4) ), \
-		         reinterpret_cast<char*>( &store.i[HIGH] ) ); \
-		data = static_cast<type1>( store.ll ); \
-	}
-
-#define def_output_simple_i(type1, type2) \
+#define def_output_simple_t(type1, type2) \
  	void output_simple(type1 const& data) { \
 		type2 store = static_cast<type2>( data ); \
-		_xtl_big_end( reinterpret_cast<char*>( &store ), \
-			 reinterpret_cast<char*>( this->desire(4) ) ); \
+		simple_xdr_policy< sizeof( type2 ) >::copy( \
+		         reinterpret_cast<char const*>( &store ), \
+			 reinterpret_cast<char*>( this->desire( sizeof( type2 ) ) ) ); \
 	}
 
-#define def_output_simple_ll(type1, type2) \
- 	void output_simple(type1 const& data) { \
-		union { type2 ll; int i[2]; } store; \
-		store.ll = static_cast<type2>( data ); \
-		_xtl_big_end( reinterpret_cast<char*>( &store.i[LOW] ), \
-			 reinterpret_cast<char*>( this->desire(4) ) ); \
-		_xtl_big_end( reinterpret_cast<char*>( &store.i[HIGH] ), \
-			 reinterpret_cast<char*>( this->desire(4) ) ); \
-	}
+// The following macros do not require a copy
+#define def_input_simple(type) \
+	void input_simple(type& data) \
+        { \
+          simple_xdr_policy< sizeof( type ) >::copy( \
+            reinterpret_cast<char const*>( this->require( sizeof( type ) ) ), \
+            reinterpret_cast<char*>(&data) ); \
+	} 
+
+#define def_output_simple(type) \
+	void output_simple(type const& data) \
+        { \
+          simple_xdr_policy< sizeof( type ) >::copy( \
+            reinterpret_cast<char const*>(&data), \
+            reinterpret_cast<char*>(this->desire( sizeof( type ) ) ) ); \
+	} 
 
 template <class Buffer>
 class XDR_format: public generic_format<Buffer> {
@@ -100,19 +106,22 @@ class XDR_format: public generic_format<Buffer> {
 	template <class Idx>
 	bool input_end_array(Idx& n) {return n--<=0;}
 
-	def_input_simple_i(bool, int)
-	def_input_simple_i(char, int)
-	def_input_simple_i(unsigned char, int)
-	def_input_simple_i(short, int)
-	def_input_simple_i(unsigned short, int)
-	def_input_simple_i(int, int)
-	def_input_simple_i(unsigned int, int)
-	def_input_simple_i(long, int)
-	def_input_simple_i(unsigned long, int)
-	def_input_simple_ll(longlong, longlong)
-	def_input_simple_ll(unsignedlonglong, longlong)
-	def_input_simple_i(float, float)
-	def_input_simple_ll(double, double)
+	def_input_simple_t(bool, int)
+	def_input_simple_t(char, int)
+	def_input_simple_t(unsigned char, int)
+	def_input_simple_t(short, int)
+	def_input_simple_t(unsigned short, int)
+
+        // These types do not need to be translated, avoiding a copy.  Note that
+        // "long" is treated as native length.
+	def_input_simple(int)
+	def_input_simple(unsigned int)
+	def_input_simple(long)
+	def_input_simple(unsigned long)
+	def_input_simple(longlong)
+	def_input_simple(unsignedlonglong)
+	def_input_simple(float)
+	def_input_simple(double)
 
 	void input_chars(char* data, int size) {
 		input_raw(data, size);
@@ -133,19 +142,22 @@ class XDR_format: public generic_format<Buffer> {
 	void output_start_array(Idx n) {output_simple(n);}
 	void output_end_array() {}
 
-	def_output_simple_i(bool, int)
-	def_output_simple_i(char, int)
-	def_output_simple_i(unsigned char, int)
-	def_output_simple_i(short, int)
-	def_output_simple_i(unsigned short, int)
-	def_output_simple_i(int, int)
-	def_output_simple_i(unsigned int, int)
-	def_output_simple_i(long, int)
-	def_output_simple_i(unsigned long, int)
-	def_output_simple_ll(longlong, longlong)
-	def_output_simple_ll(unsignedlonglong, longlong)
-	def_output_simple_i(float, float)
-	def_output_simple_ll(double, double)
+	def_output_simple_t(bool, int)
+	def_output_simple_t(char, int)
+	def_output_simple_t(unsigned char, int)
+	def_output_simple_t(short, int)
+	def_output_simple_t(unsigned short, int)
+
+        // These types do not need to be translated, avoiding a copy.  Note that
+        // "long" is treated as native length.
+	def_output_simple(int)
+	def_output_simple(unsigned int)
+	def_output_simple(long)
+	def_output_simple(unsigned long)
+	def_output_simple(longlong)
+	def_output_simple(unsignedlonglong)
+	def_output_simple(float)
+	def_output_simple(double)
 
 	void output_chars(char const* data, int size) {
 		output_raw(data, size);
@@ -163,10 +175,10 @@ class XDR_format: public generic_format<Buffer> {
 	}
 };
 
-#undef def_input_simple_i
-#undef def_input_simple_ll
-#undef def_output_simple_i
-#undef def_output_simple_ll
+#undef def_input_simple_t
+#undef def_input_simple_t
+#undef def_output_simple_t
+#undef def_output_simple_t
 #undef LOW
 #undef HIGH
 
