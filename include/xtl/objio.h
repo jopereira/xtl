@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: objio.h,v 1.5 2007/04/06 13:25:49 keithsnively Exp $
+ * $Id: objio.h,v 1.6 2009/04/02 20:53:48 keithsnively Exp $
  */
 
 #ifndef __XTL_OBJIO
@@ -129,6 +129,11 @@ class raw_format: public generic_format<Buffer> {
 	template <class Idx>
 	bool input_end_array(Idx& n) {return !(n-->0);}
 
+	template <class Idx>
+	void input_start_string(Idx& n) {this->input_start_array(n);}
+	template <class Idx>
+	bool input_end_string(Idx& n) {this->input_end_array(n);}
+
 	void input_chars(char* data, int size) {input_raw(data, size);}
 
 	void input_raw(char* data, int size) {
@@ -146,6 +151,10 @@ class raw_format: public generic_format<Buffer> {
 	template <class Idx>
 	void output_start_array(Idx n) {output_simple(n);}
 	void output_end_array() {}
+
+	template <class Idx>
+	void output_start_string(Idx n) {this->output_start_array(n);}
+        void output_end_string() {this->output_end_array();}
 
 	void output_chars(char const* data, int size) {output_raw(data, size);}
 
@@ -204,20 +213,20 @@ class obj_input {
 
 	inline obj_input& cstring(char*& data) {
 		int size;
-		format.input_start_array(size);
+		format.input_start_string(size);
 		data=new char[size+1];
 		format.input_chars(data, size);
 		data[size]=0;
-		format.input_end_array(size);
+		format.input_end_string(size);
 		return *this;
 	}
 
 	inline obj_input& cstring(char* data, int max) {
 		int size;
-		format.input_start_array(size);
+		format.input_start_string(size);
 		format.input_chars(data, size>max?max:size);
 		data[size>max?max:size]=0;
-		format.input_end_array(size);
+		format.input_end_string(size);
 		return *this;
 	}
 
@@ -229,7 +238,7 @@ class obj_input {
 	        bool allocated = false;
 
 		int size;
-		format.input_start_array(size);
+		format.input_start_string(size);
 	        if ( size > 1024 )
         	{
         		tmp = new char[size];
@@ -238,9 +247,9 @@ class obj_input {
 		format.input_chars(tmp, size);
 	        data.clear();
 		data.append(tmp, size);
-		// FIXME: Fix in the official version
+		format.input_end_string(size);
+
 	        if ( allocated ) delete[] tmp;
-		format.input_end_array(size);
 		return *this;
 	}
 
@@ -452,25 +461,25 @@ class obj_output {
 
 	inline obj_output& cstring(char const* data) {
 		int size=std::strlen(data);
-		format.output_start_array(size);
+		format.output_start_string(size);
 		format.output_chars(data, size);
-		format.output_end_array();
+		format.output_end_string();
 		return *this;
 	}
 
 	inline obj_output& cstring(char const* data, int max) {
-		int size=std::strlen(data);
-		format.output_start_array(size);
+          int size=std::strlen(data);
+		format.output_start_string(size);
 		format.output_chars(data, size);
-		format.output_end_array();
+		format.output_end_string();
 		return *this;
 	}
 
 	inline obj_output& simple(const std::string& data) {
 		int size=data.size();
-		format.output_start_array(size);
+		format.output_start_string(size);
 		format.output_chars(data.data(), size);
-		format.output_end_array();
+		format.output_end_string();
 		return *this;
 	}
 

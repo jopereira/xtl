@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: giop.h,v 1.3 2005/04/14 15:28:37 keithsnively Exp $
+ * $Id: giop.h,v 1.4 2009/04/02 20:53:48 keithsnively Exp $
  */
 
 #ifndef __XTL_GIOP
@@ -116,6 +116,11 @@ class GIOP_format: public generic_format<Buffer> {
 	bool input_end_array(Idx& n)
 		{ return n--<=0; }
 
+	template <class Idx>
+	void input_start_string(Idx& n) {this->input_start_array(n);}
+	template <class Idx>
+	bool input_end_string(Idx& n) {this->input_end_array(n);}
+
 	void input_simple( bool& data )
 		{ data=!!*req_align(1); }
  	void input_simple( char& data )
@@ -167,6 +172,10 @@ class GIOP_format: public generic_format<Buffer> {
 	void output_start_array(Idx n) {output_simple(n);}
 	void output_end_array() {}
 	
+	template <class Idx>
+	void output_start_string(Idx n) {this->output_start_array(n);}
+        void output_end_string() {this->output_end_array();}
+
  	void output_simple( bool const& data )
 		{ *des_align(1)=data?1:0; }
  	void output_simple( char const& data )

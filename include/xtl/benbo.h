@@ -105,6 +105,30 @@ class BENBO_format: public generic_format<Buffer> {
 	template <class Idx>
 	bool input_end_array(Idx& n) {return n--<=0;}
 
+        // BENBO uses null terminated strings.  Find length.
+	template <class Idx>
+	void input_start_string(Idx& n) 
+        {
+          n = 0;
+          //Look for null terminator.  Do NOT include terminator in count.
+          while ( *(reinterpret_cast< char* >( this->require( 1 ) ) ) != '\0' )
+          {
+            ++n;
+          }
+
+          // Remember we read 1 more character than counted
+          this->unrequire( n + 1 );
+        }
+
+	template <class Idx>
+	bool input_end_string(Idx& n) 
+        {
+          // The null terminator has not been read.  There may be other
+          // characters as well given max_len may have been used.  Advance past
+          // the terminator.
+          while ( *(reinterpret_cast< char* >( this->require( 1 ) ) ) != '\0' );
+        }
+
 	def_input_simple(bool)
 	def_input_simple(char)
 	def_input_simple(unsigned char)
@@ -137,6 +161,16 @@ class BENBO_format: public generic_format<Buffer> {
 	template <class Idx>
 	void output_start_array(Idx n) {output_simple(n);}
 	void output_end_array() {}
+
+  
+        // BENBO uses null terminated strings.  Do nothing.
+	template <class Idx>
+	void output_start_string(Idx n) {}
+        // Add the NULL terminator
+        void output_end_string() 
+        {
+          this->output_simple( char( '\0') );
+        }
 
 	def_output_simple(bool)
 	def_output_simple(char)

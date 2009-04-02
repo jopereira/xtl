@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: vobjio.h,v 1.2 2005/03/01 16:41:23 philgrim Exp $
+ * $Id: vobjio.h,v 1.3 2009/04/02 20:53:48 keithsnively Exp $
  */
 
 #ifndef __XTL_VOBJIO
@@ -96,6 +96,12 @@ class v_format {
 	virtual void input_start_array(int& n)=0;
 	virtual bool input_end_array(int& n)=0;
 
+        virtual void input_start_string(int& n)
+        { this->input_start_array(n); }
+          
+	virtual bool input_end_string(int& n)
+        { return this->input_end_array(n); }
+
 	virtual void input_chars(char* data, int size)=0;
 	virtual void input_raw(char* data, int size)=0;
 
@@ -123,6 +129,11 @@ class v_format {
 
 	virtual void output_start_array(int n)=0;
 	virtual void output_end_array()=0;
+
+	virtual void output_start_string(int n)
+        { this->output_start_array(n); }
+	virtual void output_end_string()
+        { this->output_end_array(); }
 
 	virtual void output_chars(char const* data, int size)=0;
 	virtual void output_raw(char const* data, int size)=0;

@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: text.h,v 1.4 2009/04/01 15:55:17 keithsnively Exp $
+ * $Id: text.h,v 1.5 2009/04/02 20:53:48 keithsnively Exp $
  */
 
 #ifndef __XTL_TEXT
@@ -64,6 +64,9 @@ class text_format: public generic_format<Buffer> {
 	void input_start_array(int& n) {gchar('<');}
 	bool input_end_array(int& n) {gchar('>'); return false;}
 
+	void input_start_string(int& n) {this->input_start_array(n);}
+	bool input_end_string(int& n) {this->input_end_array(n);}
+
  	template <class T>
 	void input_simple(T& data) {}
 
@@ -90,6 +93,9 @@ class text_format: public generic_format<Buffer> {
 
 	void output_start_array(int n) {space();pchar('<');need=false;}
 	void output_end_array() {pchar('>');need=true;}
+
+	void output_start_string(int n) {this->output_start_array(n);}
+        void output_end_string() {this->output_end_array();}
 
 	def_simple_output(bool)
 	def_simple_output(char)
