@@ -121,7 +121,7 @@ class BENBO_format: public generic_format<Buffer> {
         }
 
 	template <class Idx>
-	bool input_end_string(Idx& n) 
+	void input_end_string(Idx& n) 
         {
           // The null terminator has not been read.  There may be other
           // characters as well given max_len may have been used.  Advance past

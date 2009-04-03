@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: objio.h,v 1.6 2009/04/02 20:53:48 keithsnively Exp $
+ * $Id: objio.h,v 1.7 2009/04/03 13:13:28 keithsnively Exp $
  */
 
 #ifndef __XTL_OBJIO
@@ -130,9 +130,9 @@ class raw_format: public generic_format<Buffer> {
 	bool input_end_array(Idx& n) {return !(n-->0);}
 
 	template <class Idx>
-	void input_start_string(Idx& n) {this->input_start_array(n);}
+	void input_start_string(Idx& n) {input_simple(n);}
 	template <class Idx>
-	bool input_end_string(Idx& n) {this->input_end_array(n);}
+	void input_end_string(Idx& n) {}
 
 	void input_chars(char* data, int size) {input_raw(data, size);}
 
@@ -153,8 +153,8 @@ class raw_format: public generic_format<Buffer> {
 	void output_end_array() {}
 
 	template <class Idx>
-	void output_start_string(Idx n) {this->output_start_array(n);}
-        void output_end_string() {this->output_end_array();}
+	void output_start_string(Idx n) {output_simple(n);}
+        void output_end_string() {}
 
 	void output_chars(char const* data, int size) {output_raw(data, size);}
 
