@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: objio.h,v 1.7 2009/04/03 13:13:28 keithsnively Exp $
+ * $Id: objio.h,v 1.8 2009/04/06 19:38:21 keithsnively Exp $
  */
 
 #ifndef __XTL_OBJIO
@@ -224,7 +224,30 @@ class obj_input {
 	inline obj_input& cstring(char* data, int max) {
 		int size;
 		format.input_start_string(size);
-		format.input_chars(data, size>max?max:size);
+
+                if( size > max )
+                {
+                  // Handle the case where someone has written more bytes than
+                  // we are reading.  This allows it to be more forgiving.
+                  // Using the stack buffer saves about 20% - 40% in decoding
+                  // time.
+                  char s_buf[1024];
+                  char * tmp = s_buf;
+                  bool allocated = false;
+
+                  if ( size > 1024 )
+                  {
+                    tmp = new char[size];
+                    allocated = true;
+                  }
+                  format.input_chars(tmp, size);
+                  memcpy( data, tmp, max );
+                  if ( allocated ) delete[] tmp;
+                }
+                else
+                {
+                  format.input_chars(data, size);
+                }
 		data[size>max?max:size]=0;
 		format.input_end_string(size);
 		return *this;
@@ -468,11 +491,11 @@ class obj_output {
 	}
 
 	inline obj_output& cstring(char const* data, int max) {
-          int size=std::strlen(data);
-		format.output_start_string(size);
-		format.output_chars(data, size);
-		format.output_end_string();
-		return *this;
+                int size=std::strlen(data);
+                format.output_start_string(size>max?max:size);
+                format.output_chars(data, size>max?max:size);
+                format.output_end_string();
+                return *this;
 	}
 
 	inline obj_output& simple(const std::string& data) {

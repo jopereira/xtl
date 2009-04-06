@@ -4,7 +4,7 @@
  *
  * jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
  *
- * $Id: alltests.h,v 1.3 2006/08/29 18:42:37 keithsnively Exp $
+ * $Id: alltests.h,v 1.4 2009/04/06 19:38:21 keithsnively Exp $
  */
 
 
@@ -15,6 +15,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <iostream>
 
 class numbers {
  private:
@@ -95,12 +96,12 @@ class strings {
 
 	template <class Stream>
 	inline void composite(Stream& stream) {
-		stream.cstring(ptr).cstring(sptr, 100).simple(cpp);
+          stream.cstring(ptr).cstring(sptr, 100).simple(cpp);
 	}
 
 	bool operator==(const strings& other) const {
 		return !std::strcmp(ptr, other.ptr) &&
-			!std::strcmp(sptr, other.sptr) &&
+                  !std::strcmp(sptr, other.sptr) &&
 			cpp==other.cpp;
 	}
 };

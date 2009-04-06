@@ -4,7 +4,7 @@
  *
  * jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
  *
- * $Id: main.cpp,v 1.5 2009/04/02 20:53:47 keithsnively Exp $
+ * $Id: main.cpp,v 1.6 2009/04/06 19:38:21 keithsnively Exp $
  */
 
 
@@ -21,6 +21,8 @@ void output(char buf[], const all_tests& to);
 void compare(const all_tests& to, const all_tests& ti);
 
 int main(int argc, char* argv[]) {
+  try
+  {
 	char buf[4000];
 
 	std::cout << "Testing " << argv[0] << ": ";
@@ -28,11 +30,14 @@ int main(int argc, char* argv[]) {
 
 	all_tests to;
 	to.init();
+        std::cout << "Writing.." << std::endl;
 	output(buf, to);
 
 	all_tests ti;
+        std::cout << "Reading.." << std::endl;
 	input(buf, ti);
 
+        std::cout << "Comparing.." << std::endl;
 	compare(to, ti);
 
         std::cout << to << std::endl;
@@ -50,5 +55,21 @@ int main(int argc, char* argv[]) {
 	buf[xmbo.size()]=0;
 	std::cout << buf << std::endl;
 #endif
-	return 0;
+  }
+  catch( mem_buffer::buffer_overflow_error const & ex )
+  {
+    std::cerr << "Caught mem_buffer::buffer_overflow_error: " 
+              << ex.what() 
+              << ", bytes left: " << ex.bytes_left
+              << ", bytes needed: " << ex.bytes_needed
+              << std::endl;
+    return 1;
+  }
+  catch( std::exception const & ex )
+  {
+    std::cerr << "Caught std::exception: " << ex.what() << std::endl;
+    return 1;
+  }
+
+  return 0;
 }

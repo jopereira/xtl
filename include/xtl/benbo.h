@@ -27,48 +27,135 @@
 
 #include "config.h"
 
-// Template policy to handle different sized simple types.  Works seemlessly on
-// 32 and 64 bit platforms.
-template< unsigned char >
-class simple_type_policy;
-
-template<>
-class simple_type_policy< 1 >
+template< class FORMAT >
+class buffer_access : public FORMAT
 {
+  typedef buffer_access< FORMAT > This_t;
+
 public:
-  static inline void copy(char const* in, char* out)
+  static inline
+  void* require( FORMAT& f, int n )	
   {
-    *out = *in;
+    return (( This_t& ) f ).FORMAT::require(n);
+  }
+
+  static inline
+  void* desire( FORMAT& f, int n )	
+  {
+    return (( This_t& ) f ).FORMAT::desire(n);
   }
 };
 
-template<>
-class simple_type_policy< 2 >
+// Templates to input/output various sized data types.  Allows for easy addition
+// of types, control over types supported and high level of optimization for
+// each size.
+template< class FORMAT, unsigned char >
+class benbo_type_policy
+{};
+
+template< class FORMAT >
+class benbo_type_policy< FORMAT, 1 >
 {
 public:
-  static inline void copy(char const* in, char* out)
+  static void input( FORMAT & f, int & align, char * data )
   {
-    _xtl_big_end_16( in, out );
+    *data = *( reinterpret_cast<char*>( buffer_access< FORMAT >::require( f, 1) ) );
+    ++align;
+  }
+
+  static void output( FORMAT & f, int & align, char const * data )
+  {
+    *( reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, 1) ) ) = *data;
+    ++align;
   }
 };
 
-template<>
-class simple_type_policy< 4 >
+template< class FORMAT >
+class benbo_type_policy< FORMAT, 2 >
 {
 public:
-  static inline void copy(char const* in, char* out)
+  static void input( FORMAT & f, int & align, char * data )
   {
-    _xtl_big_end_32( in, out );
+    int pad = align % 2;
+    _xtl_big_end_16( reinterpret_cast<char*>( buffer_access< FORMAT >::require( f, pad + 2 ) ) + pad,
+                     data );
+
+    align += 2 + pad;
+
+  }
+
+  static void output( FORMAT & f, int & align, char const * data )
+  {
+    int pad = align % 2;
+    if( pad )
+    {
+      *( reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, 1 ) ) ) = '\0';
+      ++align;
+    }
+    _xtl_big_end_16( data,
+                     reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, pad + 2 ) ) + pad );
+    align += 2;
   }
 };
 
-template<>
-class simple_type_policy< 8 >
+
+template< class FORMAT >
+class benbo_type_policy< FORMAT, 4 >
 {
 public:
-  static inline void copy(char const* in, char* out)
+  static const int SIZE = 4;
+
+  static void input( FORMAT & f, int & align, char * data )
   {
-    _xtl_big_end_64( in, out );
+    int pad = ( align % SIZE ? SIZE - (align % SIZE) : 0 );
+    _xtl_big_end_32( reinterpret_cast<char*>( buffer_access< FORMAT >::require( f, pad + SIZE ) ) + pad,
+                     data );
+
+    align += SIZE + pad;
+  }
+
+  static void output( FORMAT & f, int & align, char const * data )
+  {
+    int pad = ( align % SIZE ? SIZE - (align % SIZE) : 0 );
+    if( pad )
+    {
+      memset( reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, pad ) ), '\0', pad );
+      align += pad;
+    }
+    _xtl_big_end_32( data,
+                     reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, SIZE ) ) );
+
+    align += SIZE;
+  }
+};
+
+template< class FORMAT >
+class benbo_type_policy< FORMAT, 8 >
+{
+public:
+  static const int SIZE = 8;
+
+  static void input( FORMAT & f, int & align, char * data )
+  {
+    int pad = ( align % SIZE ? SIZE - (align % SIZE) : 0 );
+    _xtl_big_end_64( reinterpret_cast<char*>( buffer_access< FORMAT >::require( f, pad + SIZE ) ) + pad,
+                     data );
+
+    align += SIZE + pad;
+  }
+
+  static void output( FORMAT & f, int & align, char const * data )
+  {
+    int pad = ( align % SIZE ? SIZE - (align % SIZE) : 0 );
+    if( pad )
+    {
+      memset( reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, pad ) ), '\0', pad );
+      align += pad;
+    }
+    _xtl_big_end_64( data,
+                     reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, SIZE ) ) );
+
+    align += SIZE;
   }
 };
 
@@ -77,17 +164,19 @@ public:
 #define def_input_simple(type) \
 	void input_simple(type& data) \
         { \
-          simple_type_policy< sizeof( type ) >::copy( \
-            reinterpret_cast<char const*>( this->require( sizeof( type ) ) ), \
-            reinterpret_cast<char*>(&data) ); \
+          benbo_type_policy< This_t, sizeof( type ) >::input(    \
+            *this,  \
+            this->align,  \
+            reinterpret_cast<char*>(&data) );  \
 	} 
 
 #define def_output_simple(type) \
 	void output_simple(type const& data) \
         { \
-          simple_type_policy< sizeof( type ) >::copy( \
-            reinterpret_cast<char const*>(&data), \
-            reinterpret_cast<char*>(this->desire( sizeof( type ) ) ) ); \
+          benbo_type_policy< This_t, sizeof( type ) >::output(   \
+            *this,  \
+            this->align,  \
+            reinterpret_cast<char const*>(&data) );  \
 	} 
 
 
@@ -95,10 +184,13 @@ public:
 template <class Buffer>
 class BENBO_format: public generic_format<Buffer> {
  private:
+  typedef BENBO_format< Buffer >  This_t;
+  int align;
+
  public:
 	typedef Buffer buffer;
 
-	BENBO_format(Buffer& buf):generic_format<Buffer>(buf) {}
+  BENBO_format(Buffer& buf):generic_format<Buffer>(buf), align( 0 ) {}
 	
 	template <class Idx>
 	void input_start_array(Idx& n) {input_simple(n);}
@@ -126,7 +218,10 @@ class BENBO_format: public generic_format<Buffer> {
           // The null terminator has not been read.  There may be other
           // characters as well given max_len may have been used.  Advance past
           // the terminator.
-          while ( *(reinterpret_cast< char* >( this->require( 1 ) ) ) != '\0' );
+          char c;
+          do {
+            input_simple( c );
+          } while ( c != '\0' );
         }
 
 	def_input_simple(bool)
@@ -145,17 +240,17 @@ class BENBO_format: public generic_format<Buffer> {
 
 	void input_chars(char* data, int size) {
 		input_raw(data, size);
+                //std::cout << "Read " << std::string( data, size ) << std::endl;
 	}
 
 	// This routine is identical to that in GIOP_format
 	void input_raw(char* data, int size) {
 		int i;
 		for(i=0;i<(size>>8)-1;i++,data+=256)
-			memcpy(data, this->require(256), 256);
+                  memcpy(data, this->require(256), 256);
 		int res=size-(i<<8);
 		memcpy(data, this->require(res), res);
-		if (res%4!=0)
-			this->require(4-res%4);
+                align += size;
 	}
 
 	template <class Idx>
@@ -197,8 +292,7 @@ class BENBO_format: public generic_format<Buffer> {
 			memcpy(this->desire(256), data, 256);
 		int res=size-(i<<8);
 		memcpy(this->desire(res), data, res);
-		if (res%4!=0)
-			memset(this->desire(4-res%4), 0, 4-res%4);
+                align += size;
 	}
 };
 
