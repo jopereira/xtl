@@ -23,7 +23,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: config.h,v 1.8 2009/04/01 15:55:17 keithsnively Exp $
+ * $Id: config.h,v 1.9 2009/11/19 20:36:48 keithsnively Exp $
  */
 
 #ifndef __XTL_CONFIG
@@ -126,7 +126,7 @@
 #	include <byteswap.h>
 #else
 inline unsigned short bswap_16(unsigned short b) {
-	return ((b&0xff00)>>8)|((b&0x00ff)>>8);
+        return ((b&0xff00)>>8)|((b&0x00ff)<<8);
 }
 
 inline unsigned int bswap_32(unsigned int b) {

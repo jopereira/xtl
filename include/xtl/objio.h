@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: objio.h,v 1.8 2009/04/06 19:38:21 keithsnively Exp $
+ * $Id: objio.h,v 1.9 2009/11/19 20:36:48 keithsnively Exp $
  */
 
 #ifndef __XTL_OBJIO
@@ -372,13 +372,17 @@ class obj_input {
 
                 int j=0;
                 format.input_start_array(j);
-                t_V tmp( j );
-                typename t_V::iterator it = tmp.begin();
+
+                // Do not preallocate array.  This allows for graceful failure on currupted input.
+                t_V tmp;
+                T etmp;
+
+                if( j <= 1024 ) tmp.reserve( j );
 
                 while(!format.input_end_array(j)) 
                 {
-                  XTL_CONTENT(*it);
-                  ++it;
+                  tmp.push_back( etmp );
+                  XTL_CONTENT( tmp.back() );
                 }
                 data.swap(tmp);
                 return *this;
@@ -392,16 +396,19 @@ class obj_input {
 
                 int j=0;
                 format.input_start_array(j);
-                t_V tmp( j );
-                typename t_V::iterator it = tmp.begin();
+
+                // Do not preallocate array.  This allows for graceful failure on currupted input.
+                t_V tmp;
+                bool b;
+
+                if( j <= 1024 ) tmp.reserve( j );
 
                 while(!format.input_end_array(j)) 
                 {
-                  bool b;
                   XTL_CONTENT( b );
-                  *it = b;
-                  ++it;
+                  tmp.push_back( b );
                 }
+
                 data.swap(tmp);
                 return *this;
         }
@@ -412,13 +419,15 @@ class obj_input {
 
                 int j=0;
                 format.input_start_array(j);
-                t_L tmp( j );
-                typename t_L::iterator it = tmp.begin();
+                
+                // Do not preallocate array.  This allows for graceful failure on currupted input.
+                t_L tmp;
+                T etmp;
 
                 while(!format.input_end_array(j)) 
                 {
-                  XTL_CONTENT(*it);
-                  ++it;
+                  tmp.push_back( etmp );
+                  XTL_CONTENT( tmp.back() );
                 }
                 data.swap(tmp);
                 return *this;

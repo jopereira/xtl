@@ -4,7 +4,7 @@
  *
  * jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
  *
- * $Id: alltests.h,v 1.4 2009/04/06 19:38:21 keithsnively Exp $
+ * $Id: alltests.h,v 1.5 2009/11/19 20:36:47 keithsnively Exp $
  */
 
 
@@ -106,34 +106,35 @@ class strings {
 	}
 };
 
-class arrays {
+template< int SIZE >
+class arrays_t {
  private:
- 	int fixed[10];
+ 	int fixed[SIZE];
 
 	int* variable;
 	int size;
 
  public:
- 	arrays(): variable((int*)0),size(0) {}
-	~arrays() {delete [] variable;}
+ 	arrays_t(): variable((int*)0),size(0) {}
+	~arrays_t() {delete [] variable;}
 
 	void init() {
-		for(int i=0;i<10;i++)
+		for(int i=0;i<SIZE;i++)
 			fixed[i]=i*2;
 
-		variable=new int[size=10];
+		variable=new int[size=SIZE];
 		for(int i=0;i<size;i++)
 			variable[i]=i*3;
 	}
 
 	template <class Stream>
 	inline void composite(Stream& stream) {
-		stream.vector(fixed, 10);
+		stream.vector(fixed, SIZE);
 		stream.array(variable, size);
 	}
 
-	bool operator==(const arrays& other) const {
-		for(int i=0;i<10;i++)
+	bool operator==(const arrays_t& other) const {
+		for(int i=0;i<SIZE;i++)
 			if (fixed[i]!=other.fixed[i])
 				return false;
 
@@ -146,6 +147,8 @@ class arrays {
 		return true;
 	}
 };
+
+typedef arrays_t< 10 > arrays;
 
 class pointers {
  private:
@@ -195,21 +198,27 @@ class templates {
 	}
 };
 
-class containers {
+template< int SIZE >
+class containers_t {
  private:
+	std::vector<int> vint;
 	std::list<int> lint;
 	std::map<int,int> mint;
 
  public:
 	void init() {
-		for(int i=0;i<10;i++)
+                vint.reserve( SIZE );
+		for(int i=0;i<SIZE;i++)
+                  vint.push_back( i );
+		for(int i=0;i<SIZE;i++)
 			lint.insert(lint.end(),i);
-		for(int i=0;i<10;i++) 
+		for(int i=0;i<SIZE;i++) 
 			mint.insert(std::pair<int const,int>(i,i*2));
 	}
 
 	template <class Stream>
 	inline void composite(Stream& stream) {
+          stream.simple( vint );
 #ifdef XTL_CONFIG_SIMPLE_CONTAINERS
 		stream.simple(lint).simple(mint);
 #else
@@ -217,10 +226,12 @@ class containers {
 #endif
 	}
 
-	bool operator==(const containers& other) const {
+	bool operator==(const containers_t& other) const {
 		return true; //FIXME
 	}
 };
+
+typedef containers_t< 10 > containers;
 
 #ifdef XTL_CONFIG_CHOICE_MACROS
 class unions {

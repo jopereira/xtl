@@ -81,7 +81,6 @@ public:
                      data );
 
     align += 2 + pad;
-
   }
 
   static void output( FORMAT & f, int & align, char const * data )

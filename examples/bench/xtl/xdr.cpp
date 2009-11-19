@@ -4,7 +4,7 @@
  *
  * jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
  *
- * $Id: xdr.cpp,v 1.1 2005/02/24 05:24:07 philgrim Exp $
+ * $Id: xdr.cpp,v 1.2 2009/11/19 20:36:48 keithsnively Exp $
  */
 
 
@@ -27,7 +27,7 @@ int main() {
 	all_tests to;
 	to.init();
 
-	for(int j=0;j<100;j++) {
+	for(int j=0;j<1000;j++) {
 		xf.reset_buffer();
 		for(int i=0;i<1000;i++)
 			os.simple(to);
