@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: xdr.h,v 1.8 2009/04/03 13:13:28 keithsnively Exp $
+ * $Id: xdr.h,v 1.9 2010/08/03 13:21:32 keithsnively Exp $
  */
 
 #ifndef __XTL_XDR
@@ -182,6 +182,27 @@ class XDR_format: public generic_format<Buffer> {
 		if (res%4!=0)
 			std::memset(this->desire(4-res%4), 0, 4-res%4);
 	}
+
+        // These methods will only work if the buffer size may be queried.  It
+        // would be too expensive to keep track of alignment, only to use here.
+        // The work around would be to create a buffer wrapper that allows size
+        // to be queried (or always returns 0).
+        inline void input_align( int n )
+        {
+          if ( n % 4 ) n += 4 - ( n % 4);
+
+          int align_incr = ((this->size() % n) ? (n - (this->size() % n)) : 0);
+
+          this->require( align_incr );
+        }
+
+        inline void output_align( int n )
+        {
+          if ( n % 4 ) n += 4 - ( n % 4);
+
+          int align_incr = ((this->size() % n) ? (n - (this->size() % n)) : 0);
+          std::memset( this->desire( align_incr ), '\0', align_incr );
+        }
 };
 
 #undef def_input_simple_xdr_t

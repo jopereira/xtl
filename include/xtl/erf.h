@@ -1,5 +1,5 @@
 /*
- * Big Endian Network Byte Order encoding class for XTL.
+ * ERF style encoding class for XTL.
  *
  */
 /* XTL - eXternalization Template Library - http://gsd.di.uminho.pt/~jop/xtl
@@ -22,15 +22,15 @@
  *
  */
 
-#ifndef __XTL_BENBO
-#define __XTL_BENBO
+#ifndef __XTL_ERF
+#define __XTL_ERF
 
 #include "config.h"
 
 template< class FORMAT >
-class buffer_access : public FORMAT
+class erf_buffer_access : public FORMAT
 {
-  typedef buffer_access< FORMAT > This_t;
+  typedef erf_buffer_access< FORMAT > This_t;
 
 public:
   static inline
@@ -49,121 +49,68 @@ public:
 // Templates to input/output various sized data types.  Allows for easy addition
 // of types, control over types supported and high level of optimization for
 // each size.
+template< class FORMAT, int N >
+class erf_type_policy_impl
+{
+public:
+  static void input( FORMAT & f, int & align, char * data )
+  {
+    *data = *( reinterpret_cast<char*>( erf_buffer_access< FORMAT >::require( f, N) ) );
+    align += N;
+  }
+
+  static void output( FORMAT & f, int & align, char const * data )
+  {
+    *( reinterpret_cast<char*>( erf_buffer_access< FORMAT >::desire( f, N) ) ) = *data;
+    align += N;
+  }
+};
+
 template< class FORMAT, unsigned char >
-class benbo_type_policy
+class erf_type_policy
 {};
 
 template< class FORMAT >
-class benbo_type_policy< FORMAT, 1 >
+class erf_type_policy< FORMAT, 1 >
 {
 public:
   static void input( FORMAT & f, int & align, char * data )
   {
-    *data = *( reinterpret_cast<char*>( buffer_access< FORMAT >::require( f, 1) ) );
+    *data = *( reinterpret_cast<char*>( erf_buffer_access< FORMAT >::require( f, 1) ) );
     ++align;
   }
 
   static void output( FORMAT & f, int & align, char const * data )
   {
-    *( reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, 1) ) ) = *data;
+    *( reinterpret_cast<char*>( erf_buffer_access< FORMAT >::desire( f, 1) ) ) = *data;
     ++align;
   }
 };
 
 template< class FORMAT >
-class benbo_type_policy< FORMAT, 2 >
+class erf_type_policy< FORMAT, 2 >
+  : public erf_type_policy_impl< FORMAT, 2 >
 {
-public:
-  static void input( FORMAT & f, int & align, char * data )
-  {
-    int pad = align % 2;
-    _xtl_big_end_16( reinterpret_cast<char*>( buffer_access< FORMAT >::require( f, pad + 2 ) ) + pad,
-                     data );
-
-    align += 2 + pad;
-  }
-
-  static void output( FORMAT & f, int & align, char const * data )
-  {
-    int pad = align % 2;
-    if( pad )
-    {
-      *( reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, 1 ) ) ) = '\0';
-      ++align;
-    }
-    _xtl_big_end_16( data,
-                     reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, pad + 2 ) ) + pad );
-    align += 2;
-  }
-};
-
-
-template< class FORMAT >
-class benbo_type_policy< FORMAT, 4 >
-{
-public:
-  static const int SIZE = 4;
-
-  static void input( FORMAT & f, int & align, char * data )
-  {
-    int pad = ( align % SIZE ? SIZE - (align % SIZE) : 0 );
-    _xtl_big_end_32( reinterpret_cast<char*>( buffer_access< FORMAT >::require( f, pad + SIZE ) ) + pad,
-                     data );
-
-    align += SIZE + pad;
-  }
-
-  static void output( FORMAT & f, int & align, char const * data )
-  {
-    int pad = ( align % SIZE ? SIZE - (align % SIZE) : 0 );
-    if( pad )
-    {
-      memset( reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, pad ) ), '\0', pad );
-      align += pad;
-    }
-    _xtl_big_end_32( data,
-                     reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, SIZE ) ) );
-
-    align += SIZE;
-  }
 };
 
 template< class FORMAT >
-class benbo_type_policy< FORMAT, 8 >
+class erf_type_policy< FORMAT, 4 >
+  : public erf_type_policy_impl< FORMAT, 4 >
 {
-public:
-  static const int SIZE = 8;
+};
 
-  static void input( FORMAT & f, int & align, char * data )
-  {
-    int pad = ( align % SIZE ? SIZE - (align % SIZE) : 0 );
-    _xtl_big_end_64( reinterpret_cast<char*>( buffer_access< FORMAT >::require( f, pad + SIZE ) ) + pad,
-                     data );
-
-    align += SIZE + pad;
-  }
-
-  static void output( FORMAT & f, int & align, char const * data )
-  {
-    int pad = ( align % SIZE ? SIZE - (align % SIZE) : 0 );
-    if( pad )
-    {
-      memset( reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, pad ) ), '\0', pad );
-      align += pad;
-    }
-    _xtl_big_end_64( data,
-                     reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, SIZE ) ) );
-
-    align += SIZE;
-  }
+template< class FORMAT >
+class erf_type_policy< FORMAT, 8 >
+  : public erf_type_policy_impl< FORMAT, 8 >
+{
 };
 
 
-// Macros to keep things neat and tidy in class BENBO_format.
+// Macros to keep things neat and tidy in class ERF_format.
 #define def_input_simple(type) \
 	void input_simple(type& data) \
         { \
-          benbo_type_policy< This_t, sizeof( type ) >::input(    \
+          erf_type_policy< This_t, sizeof( type ) >::input(    \
             *this,  \
             this->align,  \
             reinterpret_cast<char*>(&data) );  \
@@ -172,31 +119,37 @@ public:
 #define def_output_simple(type) \
 	void output_simple(type const& data) \
         { \
-          benbo_type_policy< This_t, sizeof( type ) >::output(   \
+          erf_type_policy< This_t, sizeof( type ) >::output(   \
             *this,  \
             this->align,  \
             reinterpret_cast<char const*>(&data) );  \
 	} 
 
 
-// BENBO_format class
+// ERF_format class
 template <class Buffer>
-class BENBO_format: public generic_format<Buffer> {
+class ERF_format: public generic_format<Buffer> {
  private:
-  typedef BENBO_format< Buffer >  This_t;
+  typedef ERF_format< Buffer >  This_t;
   int align;
 
  public:
 	typedef Buffer buffer;
 
-  BENBO_format(Buffer& buf):generic_format<Buffer>(buf), align( 0 ) {}
+  ERF_format(Buffer& buf):generic_format<Buffer>(buf), align( 0 ) {}
 	
 	template <class Idx>
-	void input_start_array(Idx& n) {input_simple(n);}
+	void input_start_array(Idx& n) 
+        {
+          short tmp;
+          input_simple( tmp );
+          n = (Idx)tmp;
+        }
+
 	template <class Idx>
 	bool input_end_array(Idx& n) {return n--<=0;}
 
-        // BENBO uses null terminated strings.  Find length.
+        // ERF uses null terminated strings.  Find length.
 	template <class Idx>
 	void input_start_string(Idx& n) 
         {
@@ -253,11 +206,11 @@ class BENBO_format: public generic_format<Buffer> {
 	}
 
 	template <class Idx>
-	void output_start_array(Idx n) {output_simple(n);}
+	void output_start_array(Idx n) {output_simple( (short) n);}
 	void output_end_array() {}
 
   
-        // BENBO uses null terminated strings.  Do nothing.
+        // ERF uses null terminated strings.  Do nothing.
 	template <class Idx>
 	void output_start_string(Idx n) {}
         // Add the NULL terminator
@@ -293,7 +246,6 @@ class BENBO_format: public generic_format<Buffer> {
 		memcpy(this->desire(res), data, res);
                 align += size;
 	}
-
 
         inline void input_align( int n )
         {

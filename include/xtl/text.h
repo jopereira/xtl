@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: text.h,v 1.6 2009/04/03 13:13:28 keithsnively Exp $
+ * $Id: text.h,v 1.7 2010/08/03 13:21:32 keithsnively Exp $
  */
 
 #ifndef __XTL_TEXT
@@ -121,6 +121,14 @@ class text_format: public generic_format<Buffer> {
 	void output_raw(char const* data, int size) {
 		output_chars(data, size);
 	}
+
+        inline void input_align( int n )
+        {
+        }
+
+        inline void output_align( int n )
+        {
+        }
 };
 
 #undef def_simple_output

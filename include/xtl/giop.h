@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: giop.h,v 1.5 2009/04/03 13:13:28 keithsnively Exp $
+ * $Id: giop.h,v 1.6 2010/08/03 13:21:32 keithsnively Exp $
  */
 
 #ifndef __XTL_GIOP
@@ -215,6 +215,22 @@ class GIOP_format: public generic_format<Buffer> {
 		std::memcpy(this->desire(res), data, res);
 		align+=res;
 	}
+
+        // Will work in most cases.  Can be overridden.
+        inline void input_align( int n )
+        {
+          int align_incr = ((align % n) ? (n - (align % n)) : 0);
+          // just ignore the input
+          this->require( align_incr );
+          align += align_incr;
+        }
+
+        inline void output_align( int n )
+        {
+          int align_incr = ((align % n) ? (n - (align % n)) : 0);
+          this->desire( align_incr );
+          align += align_incr;
+        }
 };
 
 #endif // __XTL_GIOP

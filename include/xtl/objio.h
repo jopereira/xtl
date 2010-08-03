@@ -21,7 +21,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: objio.h,v 1.9 2009/11/19 20:36:48 keithsnively Exp $
+ * $Id: objio.h,v 1.10 2010/08/03 13:21:32 keithsnively Exp $
  */
 
 #ifndef __XTL_OBJIO
@@ -111,6 +111,11 @@ public:
 		buffer.rewind();
 		output_start();
 	}
+
+        inline int size() const
+        {
+          return buffer.size();
+        }
 };
 
 template <class Buffer>
@@ -459,6 +464,12 @@ class obj_input {
 	decl_iobj_method(4)
 	decl_iobj_method(5)
 #endif
+
+        // Align on a boundary of size n
+	inline obj_input& align(int n) {
+          format.input_align( n );
+          return *this;
+	}
 };
 
 #define def_simple_output(type) \
@@ -630,6 +641,11 @@ class obj_output {
 #define option(t) (t*)NULL
 
 #endif
+        // Align on a boundary of size n
+	inline obj_output& align(int n) {
+          format.output_align( n );
+          return *this;
+	}
 };
 
 #undef def_simple_input

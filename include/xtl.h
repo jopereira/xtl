@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: xtl.h,v 1.3 2009/04/01 17:18:18 keithsnively Exp $
+ * $Id: xtl.h,v 1.4 2010/08/03 13:21:32 keithsnively Exp $
  */
 
 #ifndef __XTL_XTL
@@ -33,6 +33,7 @@
 #include <xtl/objio.h>
 #include <xtl/xdr.h>
 #include <xtl/benbo.h>
+#include <xtl/erf.h>
 #include <xtl/giop.h>
 
 #endif
