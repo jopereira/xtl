@@ -32,6 +32,8 @@ class buffer_access : public FORMAT
 {
   typedef buffer_access< FORMAT > This_t;
 
+  buffer_access();
+
 public:
   static inline
   void* require( FORMAT& f, int n )	
