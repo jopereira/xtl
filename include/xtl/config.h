@@ -23,7 +23,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: config.h,v 1.9 2009/11/19 20:36:48 keithsnively Exp $
+ * $Id: config.h,v 1.10 2010/08/05 16:51:14 uid186296 Exp $
  */
 
 #ifndef __XTL_CONFIG
@@ -187,6 +187,32 @@ inline void _xtl_big_end_64(char const* in, char* out ) {
       *reinterpret_cast<const unsignedlonglong*>( in );
 }
 #endif
-  
+ 
+template< int i >
+inline void _xtl_big_end( char const* in, char* out );
+ 
+template<>
+inline void _xtl_big_end< 1 >( char const* in, char* out )
+{
+  *out = *in;
+}
+ 
+template<>
+inline void _xtl_big_end< 2 >( char const* in, char* out )
+{
+  _xtl_big_end_16( in, out );
+}
+ 
+template<>
+inline void _xtl_big_end< 4 >( char const* in, char* out )
+{
+  _xtl_big_end_32( in, out );
+}
+ 
+template<>
+inline void _xtl_big_end< 8 >( char const* in, char* out )
+{
+  _xtl_big_end_64( in, out );
+}
 
 #endif

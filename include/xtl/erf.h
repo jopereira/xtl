@@ -52,61 +52,23 @@ public:
 // of types, control over types supported and high level of optimization for
 // each size.
 template< class FORMAT, int N >
-class erf_type_policy_impl
-{
-public:
-  static void input( FORMAT & f, int & align, char * data )
-  {
-    *data = *( reinterpret_cast<char*>( erf_buffer_access< FORMAT >::require( f, N) ) );
-    align += N;
-  }
-
-  static void output( FORMAT & f, int & align, char const * data )
-  {
-    *( reinterpret_cast<char*>( erf_buffer_access< FORMAT >::desire( f, N) ) ) = *data;
-    align += N;
-  }
-};
-
-template< class FORMAT, unsigned char >
 class erf_type_policy
-{};
-
-template< class FORMAT >
-class erf_type_policy< FORMAT, 1 >
 {
 public:
   static void input( FORMAT & f, int & align, char * data )
   {
-    *data = *( reinterpret_cast<char*>( erf_buffer_access< FORMAT >::require( f, 1) ) );
-    ++align;
+    _xtl_big_end< N >( reinterpret_cast<char*>( buffer_access< FORMAT >::require( f, N ) ),
+                       data );
+    align += N;
   }
 
   static void output( FORMAT & f, int & align, char const * data )
   {
-    *( reinterpret_cast<char*>( erf_buffer_access< FORMAT >::desire( f, 1) ) ) = *data;
-    ++align;
+    _xtl_big_end< N >( data,
+                       reinterpret_cast<char*>( buffer_access< FORMAT >::desire( f, N ) ) );
+    align += N;
   }
 };
-
-template< class FORMAT >
-class erf_type_policy< FORMAT, 2 >
-  : public erf_type_policy_impl< FORMAT, 2 >
-{
-};
-
-template< class FORMAT >
-class erf_type_policy< FORMAT, 4 >
-  : public erf_type_policy_impl< FORMAT, 4 >
-{
-};
-
-template< class FORMAT >
-class erf_type_policy< FORMAT, 8 >
-  : public erf_type_policy_impl< FORMAT, 8 >
-{
-};
-
 
 // Macros to keep things neat and tidy in class ERF_format.
 #define def_input_simple(type) \
@@ -143,9 +105,9 @@ class ERF_format: public generic_format<Buffer> {
 	template <class Idx>
 	void input_start_array(Idx& n) 
         {
-          short tmp;
+          unsigned short tmp;
           input_simple( tmp );
-          n = (Idx)tmp;
+          n = static_cast< Idx >( tmp );
         }
 
 	template <class Idx>
@@ -208,7 +170,12 @@ class ERF_format: public generic_format<Buffer> {
 	}
 
 	template <class Idx>
-	void output_start_array(Idx n) {output_simple( (short) n);}
+	void output_start_array(Idx n) 
+        {
+          unsigned short tmp = static_cast<unsigned short>( n );
+          output_simple( tmp );
+        }
+
 	void output_end_array() {}
 
   
