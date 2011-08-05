@@ -4,7 +4,7 @@
  *
  * jop@di.uminho.pt - http://gsd.di.uminho.pt/~jop
  *
- * $Id: benbo.cpp,v 1.2 2009/04/01 18:07:14 keithsnively Exp $
+ * $Id: benbo.cpp,v 1.3 2011/08/05 21:03:11 keithsnively Exp $
  */
 
 
@@ -26,7 +26,7 @@ int main() {
 	all_tests to;
 	to.init();
 
-	for(int j=0;j<100;j++) {
+	for(int j=0;j<1000;j++) {
 		xf.reset_buffer();
 		for(int i=0;i<1000;i++)
 			os.simple(to);

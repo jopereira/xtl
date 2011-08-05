@@ -22,7 +22,7 @@
  * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA 02111-1307, USA
  *
- * $Id: xdr.h,v 1.9 2010/08/03 13:21:32 keithsnively Exp $
+ * $Id: xdr.h,v 1.10 2011/08/05 21:03:11 keithsnively Exp $
  */
 
 #ifndef __XTL_XDR
@@ -102,12 +102,35 @@ class XDR_format: public generic_format<Buffer> {
 	XDR_format(Buffer& buf):generic_format<Buffer>(buf) {}
 	
 	template <class Idx>
-	void input_start_array(Idx& n) {input_simple(n);}
+	void input_start_array(Idx& n) 
+        {
+          unsigned int tmp;
+          input_simple( tmp );
+          n = static_cast< Idx >( tmp );
+        }
+
+        //! Start array.  Avoids needless copy for unsinged int type
+	void input_start_array(unsigned int& n) 
+        {
+          input_simple(n);
+        }
+
 	template <class Idx>
 	bool input_end_array(Idx& n) {return n--<=0;}
 
 	template <class Idx>
-	void input_start_string(Idx& n) {input_simple(n);}
+	void input_start_string(Idx& n) 
+        {
+          unsigned int tmp;
+          input_simple( tmp );
+          n = static_cast< Idx >( tmp );
+        }
+
+        //! Start string.  Avoids needless copy for unsinged int type
+	void input_start_string(unsigned int& n) 
+        {
+          input_simple(n);
+        }
 	template <class Idx>
 	void input_end_string(Idx& n) {}
 
@@ -144,11 +167,31 @@ class XDR_format: public generic_format<Buffer> {
 	}
 
 	template <class Idx>
-	void output_start_array(Idx n) {output_simple(n);}
+	void output_start_array(Idx n) 
+        {
+          output_simple( static_cast<unsigned int>( n ) );
+        }
+
+        //! Start array.  Avoids needless copy for unsigned int type
+	void output_start_array(unsigned int n) 
+        {
+          output_simple(n);
+        }
+
 	void output_end_array() {}
 
 	template <class Idx>
-	void output_start_string(Idx n) {output_simple(n);}
+	void output_start_string(Idx n) 
+        {
+          output_simple( static_cast<unsigned int>( n ) );
+        }
+
+        //! Start string.  Avoids needless copy for unsigned int type
+	void output_start_string(unsigned int n) 
+        {
+          output_simple(n);
+        }
+
         void output_end_string() {}
 
 	def_output_simple_xdr_t(bool, int)
